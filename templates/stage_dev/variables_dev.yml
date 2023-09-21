@@ -1,0 +1,24 @@
+variables:
+  subscriptionID: "d38aeb3d-c9f6-48b1-8223-fee8f298edd3"
+  location: eastus
+  environment: Development
+  service_connection: "ADO-SPN-N-001"
+  resourceGroupName: ASP-EUS-N-RGMA-D001
+  alertsResourceGroupName: ASP-EUS-N-RGMA-D002
+
+  #Alert definition naming: <resourceType_alertNumber>: <alert_type>,<alert_desc>,<severity>,<threshold>,<evaluationFrequency>,<windowSize>,<templatePath>
+  vm_alert1: 'metrics,cpu,0,90,PT5M,PT15M,\alerts\virtual-machines\cpu-alert-rule\template.json'
+  vm_alert2: 'metrics,cpu,2,80,PT5M,PT15M,\alerts\virtual-machines\cpu-alert-rule\template.json'
+  vm_alert3: 'metrics,mem,0,6000000000,PT5M,PT15M,\alerts\virtual-machines\mem-alert-rule\template.json'
+  vm_alert4: 'metrics,mem,2,12000000000,PT5M,PT15M,\alerts\virtual-machines\mem-alert-rule\template.json'
+  vm_alert5: 'logs,du,0,20,PT5M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
+  vm_alert6: 'logs,du,2,30,PT5M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
+  pip_alert1: 'metrics,availability,0,99.5,PT5M,PT15M,\alerts\public-ips\template.json'
+
+  #Virtual Machines Tenant DEV
+  node1: EUS-VM01-D001
+  node2: EUS-VM02-D001
+  pipName1: EUS-PIP01-D001
+  pipName2: EUS-PIP02-D001
+
+  LogAnalyticsWorkspaceName: EUS-LAW01-D001

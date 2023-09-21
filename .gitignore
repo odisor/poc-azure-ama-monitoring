@@ -1,0 +1,6 @@
+*.zip
+*.yml.old
+example-dash-*.json
+cmdlet.ps1
+OLD/
+*.log

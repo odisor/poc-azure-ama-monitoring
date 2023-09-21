@@ -12,24 +12,25 @@
         },
         "metricsAlert_severity": {
             "type": "int",
-            "defaultValue": 0
+            "defaultValue": 2
         },
         "metricsAlert_evaluationFrequency": {
             "type": "string",
-            "defaultValue": "PT15M"
+            "defaultValue": "PT5M"
         },
         "metricsAlert_windowSize": {
             "type": "string",
-            "defaultValue": "PT15M"
+            "defaultValue": "PT5M"
         },
         "metricsAlert_threshold": {
-            "type": "int",
-            "defaultValue": 90
+            "type": "string",
+            "defaultValue": "95"
+        },
+        "metricsAlert_automitigate": {
+            "type": "bool",
+            "defaultValue": false
         },
         "resourceId": {
-            "type": "string"
-        },
-        "vm_location": {
             "type": "string"
         },
         "actionGroup_resourceId": {
@@ -37,13 +38,13 @@
         }
     },
     "variables": {
-        "vm_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
-        "vm_name": "[last(split(parameters('resourceId'), '/'))]",
-        "metricsAlert_Name": "[parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('metricsAlert_severity'),'-vm_cpu', parameters('metricsAlert_threshold'),'-', variables('vm_name')))]"
+        "pip_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
+        "pip_name": "[last(split(parameters('resourceId'), '/'))]",
+        "metricsAlert_Name": "[parameters('tenant_name'),'-',variables('pip_resourceGroup'),'-',parameters('metricsAlert_severity'),'-pip_unavailable-',variables('pip_name')))]"
     },
     "resources": [
         {
-            "type": "microsoft.insights/metricAlerts",
+            "type": "Microsoft.Insights/metricAlerts",
             "apiVersion": "2018-03-01",
             "name": "[variables('metricsAlert_Name')]",
             "location": "[parameters('metricsAlert_location')]",
@@ -53,7 +54,7 @@
             },
             "properties": {
                 "mode": "Incremental",
-                "description": "VM CPU Percentage Usage Alerting",
+                "description": "Public IP Data Path Availability",
                 "severity": "[parameters('metricsAlert_severity')]",
                 "enabled": true,
                 "scopes": [
@@ -65,20 +66,17 @@
                     "allOf": [
                         {
                             "threshold": "[parameters('metricsAlert_threshold')]",
-                            "name": "[concat('CPU', parameters('metricsAlert_threshold'))]",
-                            "metricNamespace": "microsoft.compute/virtualmachines",
-                            "metricName": "Percentage CPU",
-                            "operator": "GreaterThan",
+                            "name": "[concat('PIP', parameters('metricsAlert_threshold'))]",
+                            "metricName": "VipAvailability",
+                            "operator": "LessThan",
                             "timeAggregation": "Average",
                             "skipMetricValidation": false,
                             "criterionType": "StaticThresholdCriterion"
                         }
                     ],
-                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                 },
-                "autoMitigate": "false",
-                "targetResourceType": "Microsoft.Compute/virtualMachines",
-                "targetResourceRegion": "[parameters('vm_location')]",
+                "autoMitigate": "[parameters('metricsAlert_automitigate')]",
                 "actions": [
                     {
                         "actionGroupId": "[parameters('actionGroup_resourceId')]"

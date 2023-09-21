@@ -1,0 +1,24 @@
+jobs:
+  - job: job_pip_alerts
+    displayName: PIP alerts Deployment Tasks
+    dependsOn:
+      - job_core_deploy
+    condition: or(eq('${{ parameters.p_pip_alerts }}', true), eq('${{ parameters.p_deployment_mode }}', 'Complete'))
+    variables:
+      - name: var_action_group_id
+        value: $[ dependencies.job_core_deploy.outputs['task_core_deploy.actionGroupId'] ]
+      - name: var_dcr_id
+        value: $[ dependencies.job_core_deploy.outputs['task_core_deploy.dcrId'] ]
+    steps:
+      - task: AzureCLI@2
+        name: task_pip_alerts_deploy
+        displayName: 'Deploy PIP alerts'
+        inputs:
+          azureSubscription: ${{ parameters.p_service_connection }}
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          scriptPath: 'scripts/alerts.ps1'
+          arguments: '-tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName) -resourceAlert "pip_alert" -actionGroup $(var_action_group_id) '
+
+
+ 

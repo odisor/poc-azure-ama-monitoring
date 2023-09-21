@@ -1,0 +1,117 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tenant_name": {
+            "type": "string",
+            "defaultValue": "dev"
+        },
+        "logsAlert_location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "logsAlert_severity": {
+            "type": "int",
+            "defaultValue": 0
+        },
+        "logsAlert_evaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT15M"
+        },
+        "logsAlert_windowSize": {
+            "type": "string",
+            "defaultValue": "PT15M"
+        },
+        "logsAlert_threshold": {
+            "type": "int",
+            "defaultValue": 25
+        },
+        "logsAlert_query": {
+            "type": "string",
+            "defaultValue": "InsightsMetrics\r\n| where Namespace == \"LogicalDisk\"\r\n| where Name == \"FreeSpacePercentage\"\r\n| extend logicalDisk = tostring(parse_json(Tags)['vm.azm.ms/mountId'])\r\n| extend freeSpacePercent = Val\r\n| where logicalDisk in (\"/\", \"/var\", \"/tmp\", \"/usr\", \"/home\")\r\n| where TimeGenerated >= ago(5m)\r\n| summarize AvgFreeSpacePercent = avg(freeSpacePercent) by logicalDisk\r\n| project logicalDisk, AvgFreeSpacePercent"
+        },
+        "resourceId": {
+            "type": "string"
+        },
+        "actionGroup_resourceId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vm_name": "[last(split(parameters('resourceId'), '/'))]",
+        "vm_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
+        "logsAlert_Name": "parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('logsAlert_severity'),'-vm_du', parameters('logsAlert_threshold'),'-',variables('vm_name')))]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2023-03-15-preview",
+            "name": "[variables('logsAlert_Name')]",
+            "location": "[parameters('logsAlert_location')]",
+            "tags": {
+                "environment": "[resourceGroup().tags['environment']]",
+                "owner": "[resourceGroup().tags['owner']]"
+            },
+            "properties": {
+                "displayName": "[variables('logsAlert_Name')]",
+                "description": "VM Logical Disks Usage Percentage Alerting",
+                "severity": "[parameters('logsAlert_severity')]",
+                "enabled": true,
+                "evaluationFrequency": "[parameters('logsAlert_evaluationFrequency')]",
+                "scopes": [
+                    "[parameters('resourceId')]"
+                ],
+                "targetResourceTypes": [
+                    "microsoft.operationalinsights/workspaces"
+                ],
+                "windowSize": "[parameters('logsAlert_windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "query": "[parameters('logsAlert_query')]",
+                            "timeAggregation": "Average",
+                            "metricMeasureColumn": "AvgFreeSpacePercent",
+                            "dimensions": [
+                                {
+                                    "name": "logicalDisk",
+                                    "operator": "Include",
+                                    "values": [
+                                        "/",
+                                        "/home",
+                                        "/tmp",
+                                        "/usr",
+                                        "/var"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThan",
+                            "threshold": "[parameters('logsAlert_threshold')]",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 1,
+                                "minFailingPeriodsToAlert": 1
+                            }
+                        }
+                    ]
+                },
+                "autoMitigate": "false",
+                "actions": {
+                    "actionGroups": [
+                        "[parameters('actionGroup_resourceId')]"
+                    ],
+                    "customProperties": {},
+                    "actionProperties": {}
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "alert_Name": {
+            "type": "string",
+            "value": "[variables('logsAlert_Name')]"
+        },
+        "alert_resourceId": {
+        "type": "string",
+        "value": "[resourceId('microsoft.insights/scheduledqueryrules', variables('logsAlert_Name'))]"
+        }
+    }
+}

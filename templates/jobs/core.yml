@@ -1,0 +1,15 @@
+        
+jobs:
+  - job: job_core_deploy
+    displayName: Common Resources Deploy
+
+    steps:
+      - task: AzureCLI@2
+        name: task_core_deploy
+        displayName: 'Deploy Core Resources'
+        inputs:
+          azureSubscription: ${{ parameters.p_service_connection }}
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          scriptPath: 'scripts/core.ps1'
+          arguments: '-tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName)'

@@ -24,12 +24,9 @@
         },
         "metricsAlert_threshold": {
             "type": "int",
-            "defaultValue": 90
+            "defaultValue": 12000000000
         },
         "resourceId": {
-            "type": "string"
-        },
-        "vm_location": {
             "type": "string"
         },
         "actionGroup_resourceId": {
@@ -39,21 +36,20 @@
     "variables": {
         "vm_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
         "vm_name": "[last(split(parameters('resourceId'), '/'))]",
-        "metricsAlert_Name": "[parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('metricsAlert_severity'),'-vm_cpu', parameters('metricsAlert_threshold'),'-', variables('vm_name')))]"
+        "metricAlert_Name": "parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('metricsAlert_severity'),'-vm-mem',div(parameters('metricsAlert_threshold'), 1000000000), 'GB-',variables('vm_name')))]"
     },
     "resources": [
         {
-            "type": "microsoft.insights/metricAlerts",
+            "type": "Microsoft.Insights/metricAlerts",
             "apiVersion": "2018-03-01",
-            "name": "[variables('metricsAlert_Name')]",
+            "name": "[variables('metricAlert_Name')]",
             "location": "[parameters('metricsAlert_location')]",
             "tags": {
                 "environment": "[resourceGroup().tags['environment']]",
                 "owner": "[resourceGroup().tags['owner']]"
             },
             "properties": {
-                "mode": "Incremental",
-                "description": "VM CPU Percentage Usage Alerting",
+                "description": "VM Free Memory Percentage Usage Alerting",
                 "severity": "[parameters('metricsAlert_severity')]",
                 "enabled": true,
                 "scopes": [
@@ -65,20 +61,17 @@
                     "allOf": [
                         {
                             "threshold": "[parameters('metricsAlert_threshold')]",
-                            "name": "[concat('CPU', parameters('metricsAlert_threshold'))]",
-                            "metricNamespace": "microsoft.compute/virtualmachines",
-                            "metricName": "Percentage CPU",
-                            "operator": "GreaterThan",
+                            "name": "[concat('MEM', parameters('metricsAlert_threshold'))]",
+                             "metricName": "Available Memory Bytes",
+                            "operator": "LessThanOrEqual",
                             "timeAggregation": "Average",
                             "skipMetricValidation": false,
                             "criterionType": "StaticThresholdCriterion"
                         }
                     ],
-                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                 },
                 "autoMitigate": "false",
-                "targetResourceType": "Microsoft.Compute/virtualMachines",
-                "targetResourceRegion": "[parameters('vm_location')]",
                 "actions": [
                     {
                         "actionGroupId": "[parameters('actionGroup_resourceId')]"
@@ -90,11 +83,11 @@
     "outputs": {
         "alert_Name": {
             "type": "string",
-            "value": "[variables('metricsAlert_Name')]"
+            "value": "[variables('metricAlert_Name')]"
         },
         "alert_resourceId": {
         "type": "string",
-        "value": "[resourceId('microsoft.insights/metricAlerts', variables('metricsAlert_Name'))]"
+        "value": "[resourceId('microsoft.insights/metricAlerts', variables('metricAlert_Name'))]"
         }
     }
 }

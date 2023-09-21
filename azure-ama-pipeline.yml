@@ -1,0 +1,90 @@
+trigger: none
+
+parameters:
+- name: p_tenant_name
+  displayName: Select Tenant/Environment to deploy the Alerts
+  type: string
+  default: "dev"
+  values:
+    - "dev"
+    - "prod"
+
+- name: p_deployment_mode
+  displayName: | 
+    "WARNING!!!     Type "Complete" for Complete Deployment Mode, any other value will deploy in "Incremental Mode".
+    "Complete" mode will override the below checks and redeploy all alerts from scratch.
+  type: string
+  default: Incremental
+  values:
+    - "Incremental"
+- name: p_vm_alerts
+  displayName: Deploy VM Alerts
+  type: boolean
+  default: true
+- name: p_pip_alerts
+  displayName: Deploy Public IP Alerts
+  type: boolean
+  default: true
+
+stages:
+- stage: Alerts_dev
+  displayName: DEV Alerts Deployment
+  pool:
+    vmImage: windows-latest
+  condition: eq('${{ parameters.p_tenant_name}}', 'dev')
+  variables:
+    - template: templates/stage_dev/variables_dev.yml@self
+
+  jobs:
+#  - deployment: Monitoringdeployment
+#    displayName: Policies & approvals (dev)
+#    environment: MONITORING
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo "The DEV stage was approved"
+
+  - template: templates/jobs/core.yml@self
+    parameters:
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'
+
+  - template: templates/jobs/vm.yml@self
+    parameters:
+      p_vm_alerts: '${{ parameters.p_vm_alerts }}'
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'
+
+- stage: Alerts_prod
+  displayName: PROD Alerts Deployment
+  dependsOn: []
+  pool:
+    vmImage: windows-latest
+  condition: eq('${{ parameters.p_tenant_name}}', 'prod')
+  variables:
+    - template: templates/stage_prod/variables_prod.yml@self
+  jobs:
+#  - deployment: Monitoringdeployment
+#    displayName: Policies & approvals (prod)
+#    environment: MONITORING
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo "The PROD stage was approved"
+
+  - template: templates/jobs/core.yml@self
+    parameters:
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'
+
+  - template: templates/jobs/vm.yml@self
+    parameters:
+      p_vm_alerts: '${{ parameters.p_vm_alerts }}'
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'

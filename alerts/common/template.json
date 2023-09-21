@@ -1,0 +1,131 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tenant_name": {
+            "type": "string",
+            "defaultValue": "dev"
+        },
+        "actionGroup_name": {
+            "type": "String",
+            "defaultValue": "POC-ALERTS"
+        },
+        "actionGroup_location": {
+            "type": "string",
+            "defaultValue": "global"
+        },
+        "msvmi_location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "workspaces_resourceId": {
+            "type": "String"
+        }
+    },
+    "variables": {
+       "dataCollectionRules_Name": "[toUpper(concat('MSVMI-', parameters('tenant_name'), '-', resourceGroup().name))]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('actionGroup_name')]",
+            "location": "[parameters('actionGroup_location')]",
+            "tags": {
+                "environment": "[resourceGroup().tags['environment']]",
+                "owner": "[resourceGroup().tags['owner']]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "groupShortName": "[last(split(parameters('actionGroup_name'), '-'))]",
+                "enabled": true,
+                "emailReceivers": [
+                    {
+                        "name": "PoC Owner",
+                        "emailAddress": "poc@owner.com",
+                        "useCommonAlertSchema": false
+                    }
+                ],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "eventHubReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [],
+                "azureFunctionReceivers": [],
+                "armRoleReceivers": []
+            }
+        },
+        {
+            "type": "Microsoft.Insights/dataCollectionRules",
+            "apiVersion": "2022-06-01",
+            "name": "[variables('dataCollectionRules_name')]",
+            "location": "[parameters('msvmi_location')]",
+            "tags": {
+                "environment": "[resourceGroup().tags['environment']]",
+                "owner": "[resourceGroup().tags['owner']]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "description": "Data collection rule for VM Insights.",
+                "dataSources": {
+                    "performanceCounters": [
+                        {
+                            "name": "VMInsightsPerfCounters",
+                            "streams": [
+                                "Microsoft-InsightsMetrics"
+                            ],
+                            "scheduledTransferPeriod": "PT1M",
+                            "samplingFrequencyInSeconds": 60,
+                            "counterSpecifiers": [
+                                "\\VmInsights\\DetailedMetrics"
+                            ]
+                        }
+                    ]
+                 },
+                "destinations": {
+                    "logAnalytics": [
+                        {
+                            "workspaceResourceId": "[parameters('workspaces_resourceId')]",
+                            "name": "VMInsightsPerf-Logs-Dest"
+                        }
+                    ]
+                },
+                "dataFlows": [
+                    {
+                        "streams": [
+                            "Microsoft-InsightsMetrics"
+                        ],
+                        "destinations": [
+                            "VMInsightsPerf-Logs-Dest"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "actionGroup_Name": {
+            "type": "string",
+            "value": "[parameters('actionGroup_name')]"
+        },
+        "actionGroup_shortName": {
+            "type": "string",
+            "value": "[reference(resourceId('microsoft.insights/actionGroups', parameters('actionGroup_name')), '2019-06-01').groupShortName]"
+        },
+        "actionGroup_resourceId": {
+        "type": "string",
+        "value": "[resourceId('microsoft.insights/actionGroups', parameters('actionGroup_name'))]"
+        },
+        "dataCollectionRule_Name": {
+            "type": "string",
+            "value": "[variables('dataCollectionRules_Name')]"
+        },
+        "dataCollectionRule_resourceId": {
+        "type": "string",
+        "value": "[resourceId('microsoft.insights/components', variables('dataCollectionRules_Name'))]"
+        }
+    }
+}

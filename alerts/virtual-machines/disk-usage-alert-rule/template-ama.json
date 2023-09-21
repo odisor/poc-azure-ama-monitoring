@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceId": {
+            "type": "string"
+        },
+        "vm_location": {
+            "type": "string"
+        },
+        "dataCollectionRule_resourceId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vm_name": "[last(split(parameters('resourceId'), '/'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('vm_name')]",
+            "location": "[parameters('vm_location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "apiVersion": "2019-07-01",
+                    "name": "[concat(variables('vm_name'), '/AzureMonitorLinuxAgent')]",
+                    "location": "[parameters('vm_location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/VirtualMachines/', variables('vm_name'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Monitor",
+                        "type": "AzureMonitorLinuxAgent",
+                        "autoUpgradeMinorVersion": true,
+                        "typeHandlerVersion": "1.0"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+            "apiVersion": "2021-09-01-preview",
+            "scope": "[parameters('resourceId')]",
+            "name": "[variables('vm_name')]",
+            "properties": {
+                "mode": "Incremental",
+                "description": "Association of data collection rule. Deleting this association will break the data collection for this virtual machine.",
+                "dataCollectionRuleId": "[parameters('dataCollectionRule_resourceId')]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,108 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "tenant_name": {
+            "type": "string",
+            "defaultValue": "dev"
+        },
+        "metricsAlert_appName": {
+            "type": "String",
+            "defaultValue": "poc-"
+        },
+        "metricsAlert_location": {
+            "type": "string",
+            "defaultValue": "global"
+        },
+        "metricsAlert_severity": {
+            "type": "int",
+            "defaultValue": 0
+        },
+        "metricsAlert_evaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT15M"
+        },
+        "metricsAlert_windowSize": {
+            "type": "string",
+            "defaultValue": "PT15M"
+        },
+        "metricsAlert_threshold": {
+            "type": "int",
+            "defaultValue": 90
+        },
+        "metricsAlert_automitigate": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "resourceId": {
+            "type": "string"
+        },
+        "vm_location": {
+            "type": "string"
+        },
+        "actionGroup_resourceId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vm_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
+        "vm_name": "[last(split(parameters('resourceId'), '/'))]",
+        "metricsAlert_Name": "[toLower(concat(parameters('metricsAlert_appName'),parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('metricsAlert_severity'),'-vm_cpu', parameters('metricsAlert_threshold'),'-', variables('vm_name')))]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('metricsAlert_Name')]",
+            "location": "[parameters('metricsAlert_location')]",
+            "tags": {
+                "ENVIRONMENT": "[resourceGroup().tags['ENVIRONMENT']]",
+                "OWNER": "[resourceGroup().tags['OWNER']]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "description": "VM CPU Percentage Usage Alerting",
+                "severity": "[parameters('metricsAlert_severity')]",
+                "enabled": true,
+                "scopes": [
+                    "[parameters('resourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('metricsAlert_evaluationFrequency')]",
+                "windowSize": "[parameters('metricsAlert_windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('metricsAlert_threshold')]",
+                            "name": "[concat('CPU', parameters('metricsAlert_threshold'))]",
+                            "metricNamespace": "microsoft.compute/virtualmachines",
+                            "metricName": "Percentage CPU",
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "skipMetricValidation": false,
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": "[parameters('metricsAlert_automitigate')]",
+                "targetResourceType": "Microsoft.Compute/virtualMachines",
+                "targetResourceRegion": "[parameters('vm_location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actionGroup_resourceId')]"
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "alert_Name": {
+            "type": "string",
+            "value": "[variables('metricsAlert_Name')]"
+        },
+        "alert_resourceId": {
+        "type": "string",
+        "value": "[resourceId('microsoft.insights/metricAlerts', variables('metricsAlert_Name'))]"
+        }
+    }
+}

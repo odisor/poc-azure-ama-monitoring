@@ -81,7 +81,7 @@ function Deploy-AlertAzCLI {
       --name $deploymentName `
       --resource-group $resourceGroup `
       --template-file $templateFile `
-      --parameters p_tenant_name=$tenantName `
+      --parameters tenant_name=$tenantName `
                    metricsAlert_severity=$($templateArgs.alert_severity) `
                    metricsAlert_threshold=$($templateArgs.alert_threshold) `
                    metricsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
@@ -114,7 +114,7 @@ function Deploy-AlertAzCLI {
         --name $deploymentName `
         --resource-group $resourceGroup `
         --template-file $templateFile `
-        --parameters p_tenant_name=$tenantName `
+        --parameters tenant_name=$tenantName `
                      logsAlert_severity=$($templateArgs.alert_severity) `
                      logsAlert_threshold=$($templateArgs.alert_threshold) `
                      logsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
@@ -129,7 +129,7 @@ function Deploy-AlertAzCLI {
         --name $deploymentName `
         --resource-group $resourceGroup `
         --template-file $templateFile `
-        --parameters p_tenant_name=$tenantName `
+        --parameters tenant_name=$tenantName `
                      logsAlert_severity=$($templateArgs.alert_severity) `
                      logsAlert_threshold=$($templateArgs.alert_threshold) `
                      logsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `

@@ -45,7 +45,7 @@ if ($dataCollectionGroups -eq "") {
         --name "common.$env:SYSTEM_DEFINITIONID.$env:BUILD_BUILDID.$env:BUILD_BUILDNUMBER" `
         --resource-group $resourceGroup `
         --template-file 'alerts/common/template.json' `
-        --parameters p_tenant_name=$tenantName `
+        --parameters tenant_name=$tenantName `
                      workspaces_resourceId=$workspacesResourceId `
 #        --what-if 
         | Tee-Object -Variable template

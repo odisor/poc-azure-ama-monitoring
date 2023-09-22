@@ -24,9 +24,9 @@ param (
 function Get-AlertVariables {
 
   if ($tenantName -eq "dev") {
-    $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_dev\variables_dev.yml"
+    $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_dev\variables.yml"
   } elseif ($tenantName -eq "prod") {
-    $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_prod\variables_prod.yml"
+    $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_prod\variables.yml"
   }
   $script:stage = Get-Content -Raw -Path $variablesFile | ConvertFrom-Yaml
    
@@ -37,7 +37,7 @@ function Get-AlertVariables {
 
   $script:alerts = $stage.variables.Keys | Where-Object { $_ -like "$resourceAlert*" }
   $script:resourceNames = $stage.variables.Keys | Where-Object { $_ -like "$($resourceNamedict.$resourceAlert)*" }
-  $script:workspacesResourceId = "/subscriptions/$($stage.variables.common_subscriptionID)/resourcegroups/$($stage.variables.resourceGroupName)/providers/microsoft.operationalinsights/workspaces/$($stage.variables.LogAnalyticsWorkspaceName)"
+  $script:workspacesResourceId = "/subscriptions/$($stage.variables.subscriptionID)/resourcegroups/$($stage.variables.resourceGroupName)/providers/microsoft.operationalinsights/workspaces/$($stage.variables.LogAnalyticsWorkspaceName)"
 
 }
 
@@ -59,8 +59,8 @@ function Get-ResourceId {
       
     switch($resourceAlert) {
 
-      "vm_alert" {$script:resourceId = "/subscriptions/$($stage.variables.common_subscriptionID)/resourceGroups/$($stage.variables.resourceGroupName)/providers/Microsoft.Compute/virtualMachines/$($stage.variables.$resourceName)"}
-      "pip_alert" {$script:resourceId = "/subscriptions/$($stage.variables.common_subscriptionID)/resourceGroups/$($stage.variables.resourceGroupName)/providers/Microsoft.Network/publicIPAddresses/$($stage.variables.$resourceName)"}
+      "vm_alert" {$script:resourceId = "/subscriptions/$($stage.variables.subscriptionID)/resourceGroups/$($stage.variables.resourceGroupName)/providers/Microsoft.Compute/virtualMachines/$($stage.variables.$resourceName)"}
+      "pip_alert" {$script:resourceId = "/subscriptions/$($stage.variables.subscriptionID)/resourceGroups/$($stage.variables.resourceGroupName)/providers/Microsoft.Network/publicIPAddresses/$($stage.variables.$resourceName)"}
 
     }
 

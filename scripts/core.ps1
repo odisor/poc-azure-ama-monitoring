@@ -13,13 +13,13 @@ param(
 function Get-AlertVariables {
 
     if ($tenantName -eq "dev") {
-      $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_dev\variables_dev.yml"
+      $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_dev\variables.yml"
     } elseif ($tenantName -eq "prod") {
-      $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_prod\variables_prod.yml"
+      $variablesFile = "$env:BUILD_SOURCESDIRECTORY\templates\stage_prod\variables.yml"
     }
     $script:stage = Get-Content -Raw -Path $variablesFile | ConvertFrom-Yaml
      
-    $script:workspacesResourceId = "/subscriptions/$($stage.variables.common_subscriptionID)/resourcegroups/$($stage.variables.resourceGroupName)/providers/microsoft.operationalinsights/workspaces/$($stage.variables.LogAnalyticsWorkspaceName)"
+    $script:workspacesResourceId = "/subscriptions/$($stage.variables.subscriptionID)/resourcegroups/$($stage.variables.resourceGroupName)/providers/microsoft.operationalinsights/workspaces/$($stage.variables.LogAnalyticsWorkspaceName)"
   
   }
 

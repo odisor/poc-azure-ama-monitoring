@@ -42,7 +42,7 @@
                 "emailReceivers": [
                     {
                         "name": "PoC Owner",
-                        "emailAddress": "poc@owner.com",
+                        "emailAddress": "odisor@gmail.com",
                         "useCommonAlertSchema": false
                     }
                 ],
@@ -125,7 +125,7 @@
         },
         "dataCollectionRule_resourceId": {
         "type": "string",
-        "value": "[resourceId('microsoft.insights/components', variables('dataCollectionRules_Name'))]"
+        "value": "[resourceId('microsoft.insights/dataCollectionRules', variables('dataCollectionRules_Name'))]"
         }
     }
 }

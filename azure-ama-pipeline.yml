@@ -29,7 +29,7 @@ stages:
     vmImage: windows-latest
   condition: eq('${{ parameters.p_tenant_name}}', 'dev')
   variables:
-    - template: templates/stage_dev/variables_dev.yml@self
+    - template: templates/stage_dev/variables.yml@self
 
   jobs:
 #  - deployment: Monitoringdeployment
@@ -61,7 +61,7 @@ stages:
     vmImage: windows-latest
   condition: eq('${{ parameters.p_tenant_name}}', 'prod')
   variables:
-    - template: templates/stage_prod/variables_prod.yml@self
+    - template: templates/stage_prod/variables.yml@self
   jobs:
 #  - deployment: Monitoringdeployment
 #    displayName: Policies & approvals (prod)

@@ -10,13 +10,9 @@ parameters:
     - "prod"
 
 - name: p_deployment_mode
-  displayName: | 
-    "WARNING!!!     Type "Complete" for Complete Deployment Mode, any other value will deploy in "Incremental Mode".
-    "Complete" mode will override the below checks and redeploy all alerts from scratch.
+  displayName: Type "Complete" for Complete Deployment Mode, any other value will deploy in "Incremental Mode"
   type: string
   default: Incremental
-  values:
-    - "Incremental"
 - name: p_vm_alerts
   displayName: Deploy VM Alerts
   type: boolean

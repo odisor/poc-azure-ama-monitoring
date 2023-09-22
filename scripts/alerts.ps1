@@ -98,7 +98,7 @@ function Deploy-AlertAzCLI {
                       actionGroup_resourceId=$actionGroup `
 #         --what-if
       }else{
-        
+
         az deployment group create `
         --name $deploymentName `
         --resource-group $resourceGroup `
@@ -109,7 +109,6 @@ function Deploy-AlertAzCLI {
                      metricsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
                      metricsAlert_windowSize=$($templateArgs.alert_windowSize) `
                      resourceId=$resourceId `
-                     vm_location=$vm_location `
                      actionGroup_resourceId=$actionGroup `
 #         --what-if
      }

@@ -56,6 +56,10 @@ if ($dataCollectionGroups -eq "") {
 
 # Print Output Variables for Next task/job
 if($?){
+    $template = $template | ConvertFrom-Json
+    $actiongroupId = $template.properties.outputs.actionGroup_resourceId.value
+    $dcrId = $template.properties.outputs.dataCollectionRule_resourceId.value
+
     try {   
         Write-Host "##vso[task.setvariable variable=dcrId;isoutput=true]$dcrId"
         Write-Host "##vso[task.setvariable variable=actionGroupId;isoutput=true]$actionGroupId"

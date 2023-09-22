@@ -77,18 +77,42 @@ function Deploy-AlertAzCLI {
 
     "metrics" {
 
-      az deployment group create `
-      --name $deploymentName `
-      --resource-group $resourceGroup `
-      --template-file $templateFile `
-      --parameters tenant_name=$tenantName `
-                   metricsAlert_severity=$($templateArgs.alert_severity) `
-                   metricsAlert_threshold=$($templateArgs.alert_threshold) `
-                   metricsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
-                   metricsAlert_windowSize=$($templateArgs.alert_windowSize) `
-                   resourceId=$resourceId `
-                   actionGroup_resourceId=$actionGroup `
-#      --what-if
+      if($resourceId -like "*/providers/Microsoft.Compute/virtualMachines/*" -and $templateArgs.alert_desc -eq "cpu") {
+
+        Write-Host "Deploying CPU Alerts to $($stage.variables.$resourceName)"
+        $vm_name = $resourceId.Split("/")[-1]
+        $vm_resourceGroup = $resourceId.Split("/")[4]
+        $vm_location = az vm show --resource-group $vm_resourceGroup --name $vm_name --query location --output tsv
+
+         az deployment group create `
+         --name $deploymentName `
+         --resource-group $resourceGroup `
+         --template-file $templateFile `
+         --parameters tenant_name=$tenantName `
+                      metricsAlert_severity=$($templateArgs.alert_severity) `
+                      metricsAlert_threshold=$($templateArgs.alert_threshold) `
+                      metricsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
+                      metricsAlert_windowSize=$($templateArgs.alert_windowSize) `
+                      resourceId=$resourceId `
+                      vm_location=$vm_location `
+                      actionGroup_resourceId=$actionGroup `
+#         --what-if
+      }else{
+        
+        az deployment group create `
+        --name $deploymentName `
+        --resource-group $resourceGroup `
+        --template-file $templateFile `
+        --parameters tenant_name=$tenantName `
+                     metricsAlert_severity=$($templateArgs.alert_severity) `
+                     metricsAlert_threshold=$($templateArgs.alert_threshold) `
+                     metricsAlert_evaluationFrequency=$($templateArgs.alert_evaluationFrequency) `
+                     metricsAlert_windowSize=$($templateArgs.alert_windowSize) `
+                     resourceId=$resourceId `
+                     vm_location=$vm_location `
+                     actionGroup_resourceId=$actionGroup `
+#         --what-if
+     }
     }
 
     "logs" {

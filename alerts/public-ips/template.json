@@ -26,10 +26,6 @@
             "type": "string",
             "defaultValue": "95"
         },
-        "metricsAlert_automitigate": {
-            "type": "bool",
-            "defaultValue": false
-        },
         "resourceId": {
             "type": "string"
         },
@@ -40,7 +36,7 @@
     "variables": {
         "pip_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
         "pip_name": "[last(split(parameters('resourceId'), '/'))]",
-        "metricsAlert_Name": "[parameters('tenant_name'),'-',variables('pip_resourceGroup'),'-',parameters('metricsAlert_severity'),'-pip_unavailable-',variables('pip_name')))]"
+        "metricsAlert_Name": "[concat(parameters('tenant_name'),'-',variables('pip_resourceGroup'),'-',parameters('metricsAlert_severity'),'-pip_unavailable-',variables('pip_name'))]"
     },
     "resources": [
         {
@@ -76,7 +72,7 @@
                     ],
                     "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                 },
-                "autoMitigate": "[parameters('metricsAlert_automitigate')]",
+                "autoMitigate": false,
                 "actions": [
                     {
                         "actionGroupId": "[parameters('actionGroup_resourceId')]"

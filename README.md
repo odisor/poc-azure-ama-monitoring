@@ -12,7 +12,7 @@ Additionally, it includes the deployment of alerts to illustrate their practical
 
 ## Pipeline Architecture
 
-The pipeline is structured in two stages (Dev and Prod) and inside each stage there are job templates, one template per resource type, i.e:
+The pipeline is designed to be multi-tenant. It is structured in two stages (Development and Production Azure Tenants) and inside each stage there are job templates, one template per resource type, i.e:
 - template: alerts/jobs/core.yml@self
 - template: alerts/jobs/vm.yml@self
 - template: alerts/jobs/pip.yml@self
@@ -64,7 +64,7 @@ The resource configuration, tenant/subscription information, alerts Resource Gro
 All the resources created by this pipeline, will be deployed to the resource group configured in the variables file under this key: **alertsResourceGroupName**.
 The list of resources to be alerted will be  read from the variables file, following this logic:
 
-```json
+```powershell
   $resourceNamedict = @{
     "vm_alert" = "node"
     "pip_alert" = "pipName"

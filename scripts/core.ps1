@@ -1,9 +1,16 @@
 param(
 
+    [string] $mode = "Incremental",
+    
     [string] $actiongroupName = "POC-ALERTS",
+
     [string] $dataCollectionGroups = "",
-    [parameter(mandatory)][string] $tenantName,
-    [Parameter(mandatory)][string] $resourceGroup
+
+    [parameter(mandatory)]
+    [string] $tenantName,
+
+    [Parameter(mandatory)]
+    [string] $resourceGroup
 
 )
 
@@ -42,6 +49,7 @@ if ($dataCollectionGroups -eq "") {
     try {
         Get-AlertVariables
         az deployment group create  `
+        --mode $mode `
         --name "common.$env:SYSTEM_DEFINITIONID.$env:BUILD_BUILDID.$env:BUILD_BUILDNUMBER" `
         --resource-group $resourceGroup `
         --template-file 'alerts/common/template.json' `

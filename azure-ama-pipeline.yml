@@ -11,7 +11,9 @@ parameters:
 
 - name: p_deployment_mode
   displayName: Deployment Mode
-  type: object
+  type: string
+  default: Incremental
+  values:
     - Incremental
     - Complete
 - name: p_vm_alerts

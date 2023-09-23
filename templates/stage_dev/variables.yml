@@ -8,12 +8,11 @@ variables:
 
   #Alert definition naming: <resourceType_alertNumber>: <alert_type>,<alert_desc>,<severity>,<threshold>,<evaluationFrequency>,<windowSize>,<templatePath>
   vm_alert1: 'metrics,cpu,0,90,PT5M,PT15M,\alerts\virtual-machines\cpu-alert-rule\template.json'
-  vm_alert2: 'metrics,cpu,2,80,PT5M,PT15M,\alerts\virtual-machines\cpu-alert-rule\template.json'
-  vm_alert3: 'metrics,mem,0,6000000000,PT5M,PT15M,\alerts\virtual-machines\mem-alert-rule\template.json'
-  vm_alert4: 'metrics,mem,2,12000000000,PT5M,PT15M,\alerts\virtual-machines\mem-alert-rule\template.json'
-  vm_alert5: 'logs,du,0,20,PT5M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
-  vm_alert6: 'logs,du,2,30,PT5M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
-  pip_alert1: 'metrics,availability,0,99.5,PT5M,PT15M,\alerts\public-ips\template.json'
+  vm_alert2: 'metrics,cpu,2,80,PT15M,PT15M,\alerts\virtual-machines\cpu-alert-rule\template.json'
+  vm_alert3: 'metrics,mem,0,4000000000,PT5M,PT15M,\alerts\virtual-machines\mem-alert-rule\template.json'
+  vm_alert4: 'logs,du,0,20,PT15M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
+  vm_alert5: 'logs,du,2,30,PT15M,PT15M,\alerts\virtual-machines\disk-usage-alert-rule\template.json'
+  pip_alert1: 'metrics,availability,0,99,PT15M,PT15M,\alerts\public-ips\template.json'
 
   #Virtual Machines Tenant DEV
   node1: EUS-VM01-D001

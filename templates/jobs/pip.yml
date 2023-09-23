@@ -18,7 +18,7 @@ jobs:
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           scriptPath: 'scripts/alerts.ps1'
-          arguments: '-mode ${{ parameters.p_deployment_mode }} -tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName) -resourceAlert "pip_alert" -actionGroup $(var_action_group_id) '
+          arguments: '-tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName) -resourceAlert "pip_alert" -actionGroup $(var_action_group_id) '
 
 
  

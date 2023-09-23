@@ -10,9 +10,10 @@ parameters:
     - "prod"
 
 - name: p_deployment_mode
-  displayName: Type "Complete" for Complete Deployment Mode, any other value will deploy in "Incremental Mode"
-  type: string
-  default: Incremental
+  displayName: Deployment Mode
+  type: object
+    - Incremental
+    - Complete
 - name: p_vm_alerts
   displayName: Deploy VM Alerts
   type: boolean
@@ -54,6 +55,13 @@ stages:
       p_deployment_mode: '${{ parameters.p_deployment_mode }}'
       p_service_connection: 'ADO-SPN-N-001'
 
+  - template: templates/jobs/pip.yml@self
+    parameters:
+      p_pip_alerts: '${{ parameters.p_pip_alerts }}'
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'
+      
 - stage: Alerts_prod
   displayName: PROD Alerts Deployment
   dependsOn: []
@@ -81,6 +89,13 @@ stages:
   - template: templates/jobs/vm.yml@self
     parameters:
       p_vm_alerts: '${{ parameters.p_vm_alerts }}'
+      p_tenant_name: '${{ parameters.p_tenant_name }}'
+      p_deployment_mode: '${{ parameters.p_deployment_mode }}'
+      p_service_connection: 'ADO-SPN-N-001'
+
+  - template: templates/jobs/pip.yml@self
+    parameters:
+      p_pip_alerts: '${{ parameters.p_pip_alerts }}'
       p_tenant_name: '${{ parameters.p_tenant_name }}'
       p_deployment_mode: '${{ parameters.p_deployment_mode }}'
       p_service_connection: 'ADO-SPN-N-001'

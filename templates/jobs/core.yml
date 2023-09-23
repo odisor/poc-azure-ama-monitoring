@@ -12,4 +12,4 @@ jobs:
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           scriptPath: 'scripts/core.ps1'
-          arguments: '-tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName)'
+          arguments: '-mode ${{ parameters.p_deployment_mode }} -tenantName ${{ parameters.p_tenant_name }} -resourceGroup $(alertsResourceGroupName)'

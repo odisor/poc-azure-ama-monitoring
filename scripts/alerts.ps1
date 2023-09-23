@@ -1,4 +1,7 @@
 param (
+
+    [string]$mode = "Incremental",
+
     [Parameter(Mandatory=$true)]
     [string]$tenantName,
 
@@ -85,6 +88,7 @@ function Deploy-AlertAzCLI {
         $vm_location = az vm show --resource-group $vm_resourceGroup --name $vm_name --query location --output tsv
 
          az deployment group create `
+         --mode $mode `
          --name $deploymentName `
          --resource-group $resourceGroup `
          --template-file $templateFile `
@@ -100,6 +104,7 @@ function Deploy-AlertAzCLI {
       }else{
 
         az deployment group create `
+        --mode $mode `
         --name $deploymentName `
         --resource-group $resourceGroup `
         --template-file $templateFile `
@@ -134,6 +139,7 @@ function Deploy-AlertAzCLI {
 
         Write-Host "Deploying Disk Usage Logs Alert Rule to $($stage.variables.$resourceName)"
         az deployment group create `
+        --mode $mode `
         --name $deploymentName `
         --resource-group $resourceGroup `
         --template-file $templateFile `
@@ -149,6 +155,7 @@ function Deploy-AlertAzCLI {
       } else {
 
         az deployment group create `
+        --mode $mode `
         --name $deploymentName `
         --resource-group $resourceGroup `
         --template-file $templateFile `

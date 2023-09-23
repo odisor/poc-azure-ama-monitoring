@@ -40,7 +40,7 @@
     "variables": {
         "vm_name": "[last(split(parameters('resourceId'), '/'))]",
         "vm_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
-        "logsAlert_Name": "[concat(parameters('tenant_name'),'-',variables('vm_resourceGroup'),'-',parameters('logsAlert_severity'),'-vm_du', parameters('logsAlert_threshold'),'-',variables('vm_name'))]"
+        "logsAlert_Name": "[concat(parameters('tenant_name'),'_',variables('vm_resourceGroup'),'_',parameters('logsAlert_severity'),'_vm-du', parameters('logsAlert_threshold'),'_',variables('vm_name'))]"
     },
     "resources": [
         {

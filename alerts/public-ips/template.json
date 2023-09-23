@@ -36,7 +36,7 @@
     "variables": {
         "pip_resourceGroup": "[split(parameters('resourceId'), '/')[4]]",
         "pip_name": "[last(split(parameters('resourceId'), '/'))]",
-        "metricsAlert_Name": "[concat(parameters('tenant_name'),'-',variables('pip_resourceGroup'),'-',parameters('metricsAlert_severity'),'-pip_unavailable-',variables('pip_name'))]"
+        "metricsAlert_Name": "[concat(parameters('tenant_name'),'_',variables('pip_resourceGroup'),'_',parameters('metricsAlert_severity'),'_pip-unavailable_',variables('pip_name'))]"
     },
     "resources": [
         {
